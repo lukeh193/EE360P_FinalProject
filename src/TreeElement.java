@@ -2,11 +2,13 @@
 public class TreeElement {
 
 	private int data;
+	private TreeElement parent;
 	private TreeElement left;
 	private TreeElement right;
 	
 	public TreeElement(int o) {
 		data = o;
+		parent = null;
 		left = null;
 		right = null;
 	}
@@ -24,6 +26,10 @@ public class TreeElement {
 		return right;
 	}
 	
+	public TreeElement getParent() {
+		return parent;
+	}
+		
 	
 	/* Setters */
 	public void setLeft(TreeElement e) {
@@ -36,6 +42,10 @@ public class TreeElement {
 	
 	public void setData(int i) {
 		data = i;
+	}
+	
+	public void setParent(TreeElement e) {
+		parent = e;
 	}
 	
 	

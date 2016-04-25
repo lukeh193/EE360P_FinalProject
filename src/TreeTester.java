@@ -20,19 +20,26 @@ public class TreeTester {
 		// Test removing leaf
 		System.out.println("Testing removing leaf (7) :");
 		tree.remove(7);
+		System.out.println("Root = " + tree.getRoot());
 		tree.inOrderTraversal();
 		
 		// Test removing node with one child
 		System.out.println("Testing removing node with one child (8) :");
 		tree.remove(8);
+		System.out.println("Root = " + tree.getRoot());
 		tree.inOrderTraversal();
 		
 		// Test removing node with two children
 		System.out.println("Testing removing node with two children (3) :");
 		tree.remove(3);
+		System.out.println("Root = " + tree.getRoot());
 		tree.inOrderTraversal();
 		
-
+		// Test removing root node
+		System.out.println("Testing removing root node (5) :");
+		tree.remove(5);
+		System.out.println("Root = " + tree.getRoot());
+		tree.inOrderTraversal();
 
 	}
 

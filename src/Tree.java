@@ -39,6 +39,7 @@ public class Tree {
 				// Check if left elem exists or not
 				if(cur.getLeft() == null) {
 					cur.setLeft(elem);
+					elem.setParent(cur);
 					return root;
 				} else {
 					cur = cur.getLeft();
@@ -46,6 +47,7 @@ public class Tree {
 			} else if(elem.getData() > cur.getData()){
 				if(cur.getRight() == null) {
 					cur.setRight(elem);
+					elem.setParent(cur);
 					return root;
 				} else {
 					cur = cur.getRight();
@@ -69,8 +71,12 @@ public class Tree {
 	 */
 	public boolean remove(int i) {
 		
+		boolean isRoot = false;
 		TreeElement parent = null;
 		TreeElement cur = root;
+		
+		if(root.getData() == i) 
+			isRoot = true;
 		
 		while(cur != null) {
 			if(i < cur.getData()) {
@@ -81,15 +87,9 @@ public class Tree {
 				cur = cur.getRight();
 			} else { 
 				
-				// Case 0 : root of tree
-				// TODO
-				if(parent == null) {
-					root = null;
-				}
-				
 				// Case 1 : No children
-				else if( cur.numChildren() == 0 ) {
-					
+				if( cur.numChildren() == 0 ) {
+										
 					// Figure out which edge of parent to delete
 					if(i < parent.getData()) {
 						parent.setLeft(null);
@@ -105,20 +105,38 @@ public class Tree {
 					// Figure out which child node has
 					if(cur.getLeft() != null) {
 						
-						// Figure out which edge of parent to change
-						if( i < parent.getData() ) {
-							parent.setLeft(cur.getLeft());
+						if(parent == null) {
+							root = cur.getLeft();
+							cur.getLeft().setParent(null);
 						} else {
-							parent.setRight(cur.getLeft());
+						
+							// Figure out which edge of parent to change
+							if( i < parent.getData() ) {
+								parent.setLeft(cur.getLeft());
+								cur.getLeft().setParent(parent);
+							} else {
+								parent.setRight(cur.getLeft());
+								cur.getLeft().setParent(parent);
+							}
+							
 						}
 						
 					} else {
 						
-						// Figure out which edge of parent to change
-						if( i < parent.getData() ) {
-							parent.setLeft(cur.getRight());
+						if(parent == null) {
+							root = cur.getRight();
+							cur.getRight().setParent(null);
 						} else {
-							parent.setRight(cur.getRight());
+						
+							// Figure out which edge of parent to change
+							if( i < parent.getData() ) {
+								parent.setLeft(cur.getRight());
+								cur.getRight().setParent(parent);
+							} else {
+								parent.setRight(cur.getRight());
+								cur.getRight().setParent(parent);
+							}
+						
 						}
 						
 					}
@@ -186,6 +204,10 @@ public class Tree {
 	 */
 	public int size() {
 		return size;
+	}
+	
+	public int getRoot() {
+		return root.getData();
 	}
 	
 	
