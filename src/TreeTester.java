@@ -3,7 +3,7 @@ public class TreeTester {
 
 	public static void main(String[] args) {
 		
-		FineTunedTree tree = new FineTunedTree();
+		Tree tree = new Tree();
 		
 		// Testing Insert
 		System.out.println("Testing insert (1 - 8) :");
@@ -17,7 +17,7 @@ public class TreeTester {
 		tree.insert(4);
 		tree.inOrderTraversal();
 		
-		/*
+
 		// Test removing leaf
 		System.out.println("Testing removing leaf (7) :");
 		tree.remove(7);
@@ -41,7 +41,7 @@ public class TreeTester {
 		tree.remove(5);
 		System.out.println("Root = " + tree.getRoot());
 		tree.inOrderTraversal();
-		*/
+		
 	}
 
 }
