@@ -80,15 +80,19 @@ public class FineTunedArrayList<E>{
 		boolean removed = false;
 		for(int i  = 0; i<size; i++){
 			if(removed){
-				array[i-1] = array[i];
+				array[i-1].writelock();
+				array[i-1] = array[i]; 
+				array[i-1].writeunlock();
+				
 			}
 			if(array[i].equals(e)){
 				removed = true;
+				sizelock.lock();
+				size--;
+				sizelock.unlock();
 			}
 			
 		}
-		if(removed)
-			size--;
 		return removed;
 	}
 	
@@ -99,22 +103,31 @@ public class FineTunedArrayList<E>{
 		
 		for(int j  = 0; j<size; j++){
 			if(removed){
+				array[j-1].writelock();
 				array[j-1] = array[j];
+				array[j-1].writeunlock();
 			}
 			if(i==j){
 				removed = true;
+				sizelock.lock();
+				size--;
+				sizelock.unlock();
 			}
 			
 		}
-		sizelock.lock();
-		size--;
-		sizelock.unlock();
 		return true;
 		
 	}
 	
 	@SuppressWarnings("unchecked")
-	public ArrayElement get(int i){
-		return (ArrayElement) array[i];
+	public ArrayElement get(int i) {
+		sizelock.lock();
+		if (i >= size) {
+			
+		}
+		array[i].readlock();
+		ArrayElement returnVal = array[i];
+		array[i].readunlock();
+		return returnVal;
 	}
 }
