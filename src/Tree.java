@@ -90,11 +90,16 @@ public class Tree {
 				// Case 1 : No children
 				if( cur.numChildren() == 0 ) {
 										
-					// Figure out which edge of parent to delete
-					if(i < parent.getData()) {
-						parent.setLeft(null);
+					if(isRoot) {
+						root = null;
+						size--;
 					} else {
-						parent.setRight(null);
+						// Figure out which edge of parent to delete
+						if(i < parent.getData()) {
+							parent.setLeft(null);
+						} else {
+							parent.setRight(null);
+						}
 					}
 					
 				}
@@ -147,20 +152,27 @@ public class Tree {
 				else if( cur.numChildren() == 2 ) {
 					TreeElement prevSuccessor = cur;
 					TreeElement successor = cur.getRight();
+					
+					// Find successor
+					int numTraversed = 0;
 					while( successor.getLeft() != null ) {
 						prevSuccessor = successor;
 						successor = successor.getLeft();
+						numTraversed++;
 					}
-					
-					// Change data of element to be removed
+					// Found replacement
 					cur.setData(successor.getData());
-					
-					// Remove 'leaf element'
-					if(prevSuccessor.getLeft().getData() == i) {
-						prevSuccessor.setLeft(null);
+					if(successor.numChildren() == 1) {
+						prevSuccessor.setLeft(successor.getRight());
 					} else {
-						prevSuccessor.setRight(null);
-					}
+						if(numTraversed == 0) {
+							prevSuccessor.setData(successor.getData());
+							prevSuccessor.setRight(null);
+						} else {
+							//prevSuccessor.setData(successor.getData());
+							prevSuccessor.setLeft(null);
+						}
+					}					
 					
 				}
 				
