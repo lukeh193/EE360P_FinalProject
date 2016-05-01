@@ -76,10 +76,34 @@ public class BasicSkipList {
 	
 	public SkipListEntry get(int val) {
 		SkipListEntry cur = head;
-		while (cur.getValue() != val || cur.getValue() == )
+		while (cur.getValue() != val || cur.getValue() == null) {
+			while (cur.getRight().getValue() < val) {
+				if (cur.getLeft() != null) {
+					cur.getLeft().unlock();
+				}
+			}
+			if (cur.getRight().getValue() > val) {
+				cur = cur.getDown();
+			}
+		}
+		return cur;
 	}
 	
-	public boolean delete(int val) {
-		
+	public void delete(int val) { //do we need to return a bool if it works?
+		SkipListEntry localVal = this.get(val);
+		while (localVal != null) {
+			localVal.lock();
+			SkipListEntry preVal = localVal.getLeft();
+			preVal.lock();
+			SkipListEntry nextVal = localVal.getRight();
+			nextVal.lock();
+			preVal.setRight(nextVal);
+			nextVal.setLeft(preVal);
+			localVal = localVal.getDown();
+			preVal.unlock();
+			nextVal.unlock();
+			localVal.setAllToNull();
+			localVal.unlock();
+		}
 	}
 }
