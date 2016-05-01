@@ -9,7 +9,7 @@ public class TreeTester {
 		elements.add(100);
 		elements.add(1000);
 		elements.add(10000);
-		//elements.add(100000);
+		elements.add(100000);
 		
 		// Single Thread Test
 		singleThreadTest(elements);
@@ -176,7 +176,7 @@ public class TreeTester {
 			float concurrentToJavaRemove = avgFineTuneTreeRemove/avgJavaTreeRemove;
 			float concurrentToStandardRemove = avgFineTuneTreeRemove/avgStdTreeRemove;
 			
-			System.out.println("Comparison of Insert of " + numElements + " elements :");
+			System.out.println("\nComparison of Insert of " + numElements + " elements :");
 			System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaInsert);
 			System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaInsert);
 			System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardInsert);
