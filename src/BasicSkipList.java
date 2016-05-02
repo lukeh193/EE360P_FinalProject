@@ -37,6 +37,7 @@ public class BasicSkipList {
 			newHead.setDown(head);
 			newHead.setRight(new SkipListEntry(Integer.MAX_VALUE));
 			SkipListEntry tempEnd = head.getRight();
+			tempEnd.setLeft(head);
 			while (tempEnd.getValue() != Integer.MAX_VALUE){
 				tempEnd = tempEnd.getRight();
 			}
@@ -65,6 +66,8 @@ public class BasicSkipList {
 				SkipListEntry temp = currentEntry.getRight();
 				currentEntry.setRight(toBeAdded);
 				toBeAdded.setRight(temp);
+				toBeAdded.setLeft(currentEntry);
+				temp.setLeft(toBeAdded);
 				if(myRecentEntry != null){
 					myRecentEntry.setDown(toBeAdded);
 				}
@@ -76,7 +79,7 @@ public class BasicSkipList {
 	
 	public SkipListEntry get(int val) {
 		SkipListEntry cur = head;
-		while (cur.getValue() != val || cur.getValue() == null) {
+		while (cur != null) {
 			while (cur.getRight().getValue() < val) {
 				cur = cur.getRight();
 			}
@@ -84,13 +87,10 @@ public class BasicSkipList {
 				cur = cur.getDown();
 			} else if (cur.getRight().getValue() == val) {
 				cur = cur.getRight();
-				break;
+				return cur;
 			}
 		}
-		if(cur.getValue() != val){
-			return null;
-		}
-		return cur;
+		return null;
 	}
 	
 	public void delete(int val) { //do we need to return a bool if it works?
@@ -100,13 +100,25 @@ public class BasicSkipList {
 			SkipListEntry nextVal = localVal.getRight();
 			preVal.setRight(nextVal);
 			nextVal.setLeft(preVal);
+			SkipListEntry oldLocal = localVal;
 			localVal = localVal.getDown();
-			localVal.setAllToNull();
+			oldLocal.setAllToNull();
 		}
 	}
 	
-	public void print() {
-		StringBuilder result;
-		//result = 
+	public StringBuilder print() {
+		StringBuilder result = new StringBuilder();
+		SkipListEntry current = head;
+		SkipListEntry leftNode = head;
+		while(leftNode.getValue() != null){
+			while(current != null){
+				result = result.append(current.getValue().toString() + " ");
+				current = current.getRight();
+			}
+			leftNode = leftNode.getDown();
+			current = leftNode;
+			result.append("\n");
+		}
+		return result;
 	}
 }

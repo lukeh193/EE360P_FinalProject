@@ -40,6 +40,7 @@ public class FineTunedSkipList {
 			newHead.setRight(new FineTunedSkipListEntry(Integer.MAX_VALUE));
 			FineTunedSkipListEntry tempEnd = head.getRight();
 			tempEnd.lock();
+			tempEnd.setLeft(head);
 			FineTunedSkipListEntry prevEnd;
 			while (tempEnd.getValue() != Integer.MAX_VALUE){
 				prevEnd = tempEnd;
@@ -111,18 +112,24 @@ public class FineTunedSkipList {
 	public FineTunedSkipListEntry get(int val) {
 		FineTunedSkipListEntry cur = head;
 		cur.lock();
-		while (cur.getValue() != val || cur.getValue() == null) {
+		while (cur != null) {
 			while (cur.getRight().getValue() < val) {
+				cur = cur.getRight();
+				if(cur == null){
+					return null;
+				}
+				cur.lock();
 				if (cur.getLeft() != null) {
 					cur.getLeft().unlock();
 				}
-				cur = cur.getRight();
-				cur.lock();
 			}
 			FineTunedSkipListEntry temp;
 			if (cur.getRight().getValue() > val) {
 				temp = cur;
 				cur = cur.getDown();
+				if(cur == null){
+					return null;
+				}
 				cur.lock();
 				temp.unlock();
 			} else if (cur.getRight().getValue() == val) {
@@ -150,11 +157,12 @@ public class FineTunedSkipList {
 			nextVal.lock();
 			preVal.setRight(nextVal);
 			nextVal.setLeft(preVal);
+			FineTunedSkipListEntry oldLocal = localVal;
 			localVal = localVal.getDown();
 			preVal.unlock();
 			nextVal.unlock();
-			localVal.setAllToNull();
-			localVal.unlock();
+			oldLocal.setAllToNull();
+			oldLocal.unlock();
 		}
 	}
 	
