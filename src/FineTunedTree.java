@@ -21,14 +21,12 @@ public class FineTunedTree {
 	
 	private Lock sizeLock;
 	private Lock rootLock;
-	private Lock dummyLock;
-	
+
 	public FineTunedTree() {
 		root = null;
 		size = 0;
 		sizeLock = new ReentrantLock();
 		rootLock = new ReentrantLock();
-		dummyLock = new ReentrantLock();
 	}
 	
 	/**
@@ -94,16 +92,18 @@ public class FineTunedTree {
 		FineTunedTreeElement cur = root;
 		FineTunedTreeElement parent = null;
 		
-		// Need to probs fix
+		rootLock.lock();
 		if(root == null) {
-			rootLock.lock();
-			root = elem;
 			sizeLock.lock();
+			root = elem;
 			size = 1;
 			sizeLock.unlock();
 			rootLock.unlock();
 			return root;
+		} else {
+			rootLock.unlock();
 		}
+		
 		
 		while(cur != null) {
 			
@@ -301,13 +301,21 @@ public class FineTunedTree {
 				}
 			} else { // Continue traversing tree
 				if(i < next.getData()) {
-					next.getLeft().lock.lock();
-					cur = next;
-					next = next.getLeft();
+					if(next.getLeft() != null) {
+						next.getLeft().lock.lock();
+						cur = next;
+						next = next.getLeft();
+					} else {
+						return false;
+					}
 				} else {
-					next.getRight().lock.lock();
-					cur = next;
-					next = next.getRight();
+					if(next.getRight() != null) {
+						next.getRight().lock.lock();
+						cur = next;
+						next = next.getRight();
+					} else {
+						return false;
+					}
 				}
 			}
 			
@@ -339,7 +347,7 @@ public class FineTunedTree {
 		ArrayList<FineTunedTreeElement> locked = new ArrayList<FineTunedTreeElement> ();
 		
 		e.getRight().lock.lock();
-		FineTunedTreeElement localPrev = null;
+		FineTunedTreeElement localPrev = e;
 		FineTunedTreeElement localNext = e.getRight();
 		locked.add(localNext);
 		
