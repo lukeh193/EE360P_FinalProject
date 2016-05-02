@@ -45,18 +45,18 @@ public class BasicSkipList {
 			head = newHead;
 		}
 		
-		int myLevel = 0;
+		int myLevel = 1;
 		Random random = new Random();
 		while(random.nextBoolean() && myLevel <= height){
 			myLevel++;
 		}
 		SkipListEntry currentEntry = head;
 		SkipListEntry myRecentEntry = null;
-		for(int i = 0; i< height-myLevel; i++){
+		for(int i = 0; i< (height-myLevel); i++){
 			currentEntry = currentEntry.getDown();
 		}
 
-		while(currentEntry != null){
+		while(currentEntry != null && currentEntry.getRight() != null){
 			while(currentEntry.getRight().getValue() < addValue){
 				currentEntry = currentEntry.getRight();
 			}
@@ -78,12 +78,13 @@ public class BasicSkipList {
 		SkipListEntry cur = head;
 		while (cur.getValue() != val || cur.getValue() == null) {
 			while (cur.getRight().getValue() < val) {
-				if (cur.getLeft() != null) {
-					cur.getLeft().unlock();
-				}
+				cur = cur.getRight();
 			}
 			if (cur.getRight().getValue() > val) {
 				cur = cur.getDown();
+			} else if (cur.getRight().getValue() == val) {
+				cur = cur.getRight();
+				break;
 			}
 		}
 		return cur;
@@ -92,18 +93,17 @@ public class BasicSkipList {
 	public void delete(int val) { //do we need to return a bool if it works?
 		SkipListEntry localVal = this.get(val);
 		while (localVal != null) {
-			localVal.lock();
 			SkipListEntry preVal = localVal.getLeft();
-			preVal.lock();
 			SkipListEntry nextVal = localVal.getRight();
-			nextVal.lock();
 			preVal.setRight(nextVal);
 			nextVal.setLeft(preVal);
 			localVal = localVal.getDown();
-			preVal.unlock();
-			nextVal.unlock();
 			localVal.setAllToNull();
-			localVal.unlock();
 		}
+	}
+	
+	public void print() {
+		StringBuilder result;
+		//result = 
 	}
 }

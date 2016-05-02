@@ -1,13 +1,9 @@
-import java.util.concurrent.locks.ReentrantLock;
-
-
 public class SkipListEntry {
 
 	private Integer value;
 	private SkipListEntry down;
 	private SkipListEntry right;
 	private SkipListEntry left;
-	private ReentrantLock lock;
 	
 	
 	public SkipListEntry(Integer value){
@@ -15,7 +11,6 @@ public class SkipListEntry {
 		down = null;
 		right = null;
 		left = null;
-		lock = new ReentrantLock();
 	}
 	
 	public SkipListEntry getDown() {
@@ -39,14 +34,6 @@ public class SkipListEntry {
 	}
 	public Integer getValue() {
 		return value;
-	}
-	
-	public void lock() {
-		lock.lock();
-	}
-	
-	public void unlock() {
-		lock.unlock();
 	}
 	
 	public void setAllToNull() {
