@@ -37,6 +37,7 @@ public class BasicSkipList {
 			newHead.setDown(head);
 			newHead.setRight(new SkipListEntry(Integer.MAX_VALUE));
 			SkipListEntry tempEnd = head.getRight();
+			tempEnd.setLeft(head);
 			while (tempEnd.getValue() != Integer.MAX_VALUE){
 				tempEnd = tempEnd.getRight();
 			}
@@ -45,18 +46,18 @@ public class BasicSkipList {
 			head = newHead;
 		}
 		
-		int myLevel = 0;
+		int myLevel = 1;
 		Random random = new Random();
 		while(random.nextBoolean() && myLevel <= height){
 			myLevel++;
 		}
 		SkipListEntry currentEntry = head;
 		SkipListEntry myRecentEntry = null;
-		for(int i = 0; i< height-myLevel; i++){
+		for(int i = 0; i< (height-myLevel); i++){
 			currentEntry = currentEntry.getDown();
 		}
 
-		while(currentEntry != null){
+		while(currentEntry != null && currentEntry.getRight() != null){
 			while(currentEntry.getRight().getValue() < addValue){
 				currentEntry = currentEntry.getRight();
 			}
@@ -65,6 +66,8 @@ public class BasicSkipList {
 				SkipListEntry temp = currentEntry.getRight();
 				currentEntry.setRight(toBeAdded);
 				toBeAdded.setRight(temp);
+				toBeAdded.setLeft(currentEntry);
+				temp.setLeft(toBeAdded);
 				if(myRecentEntry != null){
 					myRecentEntry.setDown(toBeAdded);
 				}
@@ -76,34 +79,46 @@ public class BasicSkipList {
 	
 	public SkipListEntry get(int val) {
 		SkipListEntry cur = head;
-		while (cur.getValue() != val || cur.getValue() == null) {
+		while (cur != null) {
 			while (cur.getRight().getValue() < val) {
-				if (cur.getLeft() != null) {
-					cur.getLeft().unlock();
-				}
+				cur = cur.getRight();
 			}
 			if (cur.getRight().getValue() > val) {
 				cur = cur.getDown();
+			} else if (cur.getRight().getValue() == val) {
+				cur = cur.getRight();
+				return cur;
 			}
 		}
-		return cur;
+		return null;
 	}
 	
 	public void delete(int val) { //do we need to return a bool if it works?
 		SkipListEntry localVal = this.get(val);
 		while (localVal != null) {
-			localVal.lock();
 			SkipListEntry preVal = localVal.getLeft();
-			preVal.lock();
 			SkipListEntry nextVal = localVal.getRight();
-			nextVal.lock();
 			preVal.setRight(nextVal);
 			nextVal.setLeft(preVal);
+			SkipListEntry oldLocal = localVal;
 			localVal = localVal.getDown();
-			preVal.unlock();
-			nextVal.unlock();
-			localVal.setAllToNull();
-			localVal.unlock();
+			oldLocal.setAllToNull();
 		}
+	}
+	
+	public StringBuilder print() {
+		StringBuilder result = new StringBuilder();
+		SkipListEntry current = head;
+		SkipListEntry leftNode = head;
+		while(leftNode.getValue() != null){
+			while(current != null){
+				result = result.append(current.getValue().toString() + " ");
+				current = current.getRight();
+			}
+			leftNode = leftNode.getDown();
+			current = leftNode;
+			result.append("\n");
+		}
+		return result;
 	}
 }
