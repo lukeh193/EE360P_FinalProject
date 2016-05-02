@@ -3,39 +3,50 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.sun.javafx.scene.control.skin.ProgressIndicatorSkin;
+
 
 public class TreeTester {
 	
 	public static FineTunedTree concurrentTree;
 	
 	
+	private static boolean printSingleThreadTests = false;
+	private static boolean printMultiThreadTests = false;
 	
+	static double avgJavaTreeInsert;
+	static double avgStdTreeInsert;
+	static double avgFineTuneInsert;
+	
+	static double avgJavaTreeGet;
+	static double avgStdTreeGet;
+	static double avgFineTuneTreeGet;
+	
+	static double avgJavaTreeRemove;
+	static double avgStdTreeRemove;
+	static double avgFineTuneTreeRemove;
 	
 	public static void main(String[] args) {
 		
 		ArrayList<Integer> elements = new ArrayList<Integer>();
 		
-		/*
-		 * To get the single-thread results (comparison between trees)
-		 * run as is, and results will be printed to console
-		 * 
-		 * To get Results of multithreading, 
-		 * 	- comment out all but one of the 'elements.add(##)' lines
-		 * 	- scroll down to find print statements, and comment out where it is marked
-		 * 	- scroll to very bottom, and uncomment the print statements
-		 * 	- you need to do this once for each of the 3 'elements.add(##)' statements
-		 * 
-		 */
-		
-		elements.add(1000);
-		elements.add(10000);
-		elements.add(100000);
+		// Get type of test to run
+		if(args[0].equals("single")) {
+			printSingleThreadTests = true;
+			elements.add(1000);
+			elements.add(10000);
+			elements.add(100000);
+		} else if(args[0].equals("multi")) {
+			printMultiThreadTests = true;
+			elements.add(Integer.parseInt(args[1]));
+		}
 		
 		// Single Thread Test
 		ArrayList<ArrayList<Integer>> dataArrays = singleThreadTest(elements);
 		
 		// Multi Thread Test
-		//multiThreadTest(elements, dataArrays);
+		if(printMultiThreadTests)
+			multiThreadTest(elements, dataArrays);
 	}
 	
 	
@@ -162,18 +173,6 @@ public class TreeTester {
 	
 			}
 			
-			double avgJavaTreeInsert;
-			double avgStdTreeInsert;
-			double avgFineTuneInsert;
-			
-			double avgJavaTreeGet;
-			double avgStdTreeGet;
-			double avgFineTuneTreeGet;
-			
-			double avgJavaTreeRemove;
-			double avgStdTreeRemove;
-			double avgFineTuneTreeRemove;
-			
 			avgJavaTreeInsert = javaInsertTreeTime/numIterations;
 			avgStdTreeInsert = standardInsertTreeTime/numIterations;
 			avgFineTuneInsert = concurrentInsertTreeTime/numIterations;
@@ -213,30 +212,23 @@ public class TreeTester {
 			double standardToJavaRemove = avgStdTreeRemove/avgJavaTreeRemove;
 			double concurrentToJavaRemove = avgFineTuneTreeRemove/avgJavaTreeRemove;
 			double concurrentToStandardRemove = avgFineTuneTreeRemove/avgStdTreeRemove;
-			
-			///////////////////////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////////////////////////////////////////////////////
-			// Comment the below block out for multi-thread tests
-			///////////////////////////////////////////////////////////////////////////////////////////
-			
-			System.out.println("\nComparison of Insert of " + numElements + " elements :");
-			System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaInsert);
-			System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaInsert);
-			System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardInsert);
-			
-			System.out.println("Comparison of Get of " + numElements + " elements :");
-			System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaGet);
-			System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaGet);
-			System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardGet);
-			
-			System.out.println("Comparison of Remove of " + numElements + " elements :");
-			System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaRemove);
-			System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaRemove);
-			System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardRemove);
-			
-			/////////////////////////////////////////////////////////////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////////////////
-			
+						
+			if(printSingleThreadTests) {
+				System.out.println("\nComparison of Insert of " + numElements + " elements :");
+				System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaInsert);
+				System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaInsert);
+				System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardInsert);
+				
+				System.out.println("Comparison of Get of " + numElements + " elements :");
+				System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaGet);
+				System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaGet);
+				System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardGet);
+				
+				System.out.println("Comparison of Remove of " + numElements + " elements :");
+				System.out.println("\tOur Standard Tree to Java's TreeSet\t: " + standardToJavaRemove);
+				System.out.println("\tFine-TunedTree to Java's TreeSet\t: " + concurrentToJavaRemove);
+				System.out.println("\tFine-TunedTree to Our Standard Tree\t: " + concurrentToStandardRemove);
+			}			
 			
 		}
 		
@@ -321,27 +313,25 @@ public class TreeTester {
 			double avgGetTime = totalGet/numIterations;
 			double avgRemoveTime = totalRemove/numIterations;
 			
-			////////////////////////////////////////////////////////////////////////////////////////
-			/* Uncomment these for multi-threading tests *
-			System.out.println("\nAverage Time for Insert of " + numElements + " elements :\n");
-			System.out.println("\tJava' TreeSet\t\t: " + avgJavaTreeInsert + " ns");
-			System.out.println("\tOur Standard Tree\t: " + avgStdTreeInsert + " ns\n");
-			System.out.println("\tFine-Tuned Tree\t\t: " + avgFineTuneInsert + " ns");
-			System.out.println("\tMulti-threads\t\t: " + avgInsertTime);
-			
-			System.out.println("\nAverage Time for Get of " + numElements + " elements :\n");
-			System.out.println("\tJava's TreeSet\t\t: " + avgJavaTreeGet + " ns");
-			System.out.println("\tOur Standard Tree\t: " + avgStdTreeGet + " ns\n");
-			System.out.println("\tFine-Tuned Tree\t\t: " + avgFineTuneTreeGet + " ns");
-			System.out.println("\tMulti-threads\t\t: " + avgGetTime);
-			
-			System.out.println("\nAverage Time for Remove of " + numElements + " elements :\n");
-			System.out.println("\tJava's TreeSet\t\t: " + avgJavaTreeRemove + " ns");
-			System.out.println("\tOur Standard Tree\t: " + avgStdTreeRemove + " ns\n");
-			System.out.println("\tFine-Tuned Tree\t\t: " + avgFineTuneTreeRemove + " ns");
-			System.out.println("\tMulti-threads\t\t: " + avgRemoveTime + " ns");
-			*/
-			////////////////////////////////////////////////////////////////////////////////////////
+			if(printMultiThreadTests) {
+				System.out.println("\nAverage Time for Insert of " + numElements + " elements :\n");
+				System.out.println("\tJava' TreeSet\t\t: " + avgJavaTreeInsert + " ns");
+				System.out.println("\tOur Standard Tree\t: " + avgStdTreeInsert + " ns\n");
+				System.out.println("\tFine-Tuned Tree\t\t: " + avgFineTuneInsert + " ns");
+				System.out.println("\tMulti-threads\t\t: " + avgInsertTime + " ns");
+				
+				System.out.println("\nAverage Time for Get of " + numElements + " elements :\n");
+				System.out.println("\tJava's TreeSet\t\t: " + avgJavaTreeGet + " ns");
+				System.out.println("\tOur Standard Tree\t: " + avgStdTreeGet + " ns\n");
+				System.out.println("\tFine-Tuned Tree\t\t: " + avgFineTuneTreeGet + " ns");
+				System.out.println("\tMulti-threads\t\t: " + avgGetTime + " ns");
+				
+				System.out.println("\nAverage Time for Remove of " + numElements + " elements :\n");
+				System.out.println("\tJava's TreeSet\t\t: " + avgJavaTreeRemove + " ns");
+				System.out.println("\tOur Standard Tree\t: " + avgStdTreeRemove + " ns\n");
+				System.out.println("\tFine-Tuned Tree\t\t: " + avgFineTuneTreeRemove + " ns");
+				System.out.println("\tMulti-threads\t\t: " + avgRemoveTime + " ns");
+			}
 		}
 		
 	}
