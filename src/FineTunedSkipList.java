@@ -33,6 +33,7 @@ public class FineTunedSkipList {
 	
 	public void add(Integer addValue){
 		head.lock();
+		FineTunedSkipListEntry oldHead = head;
 		if(!head.getRight().getValue().equals(Integer.MAX_VALUE)){
 			FineTunedSkipListEntry newHead = new FineTunedSkipListEntry(Integer.MIN_VALUE);
 			newHead.setDown(head);
@@ -51,13 +52,14 @@ public class FineTunedSkipList {
 			height++;
 			head = newHead;
 		}
-		head.unlock();
+		oldHead.unlock();
 		
-		int myLevel = 0;
+		int myLevel = 1;
 		Random random = new Random();
-		while(random.nextBoolean() && myLevel <= height){
+		myLevel = random.nextInt(height) + 1;
+		/*while(random.nextBoolean() && myLevel < height){
 			myLevel++;
-		}
+		}*/
 		FineTunedSkipListEntry currentEntry = head;
 		FineTunedSkipListEntry myRecentEntry = null;
 		FineTunedSkipListEntry tempEntry = null;
@@ -95,8 +97,8 @@ public class FineTunedSkipList {
 				tempEntry = currentEntry; //cur Entry already locked
 				currentEntry = currentEntry.getDown();
 				
-				if (tempEntry != null) {
-					tempEntry.lock();
+				if (currentEntry != null) { //|| currentEntry.getValue() != null) {
+					currentEntry.lock();
 				}
 				
 				tempEntry.unlock();
@@ -132,6 +134,9 @@ public class FineTunedSkipList {
 			}
 		}
 		cur.unlock();
+		if(cur.getValue() != val){
+			return null;
+		}
 		return cur;
 	}
 	
@@ -151,5 +156,21 @@ public class FineTunedSkipList {
 			localVal.setAllToNull();
 			localVal.unlock();
 		}
+	}
+	
+	public StringBuilder print() {
+		StringBuilder result = new StringBuilder();
+		FineTunedSkipListEntry current = head;
+		FineTunedSkipListEntry leftNode = head;
+		while(leftNode.getValue() != null){
+			while(current != null){
+				result = result.append(current.getValue().toString() + " ");
+				current = current.getRight();
+			}
+			leftNode = leftNode.getDown();
+			current = leftNode;
+			result.append("\n");
+		}
+		return result;
 	}
 }

@@ -87,6 +87,9 @@ public class BasicSkipList {
 				break;
 			}
 		}
+		if(cur.getValue() != val){
+			return null;
+		}
 		return cur;
 	}
 	
