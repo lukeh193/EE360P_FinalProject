@@ -113,31 +113,36 @@ public class FineTunedSkipList {
 		FineTunedSkipListEntry cur = head;
 		cur.lock();
 		while (cur != null) {
-			while (cur.getRight().getValue() < val) {
-				cur = cur.getRight();
-				if(cur == null){
-					return null;
+			if(cur.getRight() != null){
+				while (cur.getRight().getValue() < val) {
+					cur = cur.getRight();
+					if(cur == null){
+						return null;
+					}
+					cur.lock();
+					if (cur.getLeft() != null) {
+						cur.getLeft().unlock();
+					}
 				}
-				cur.lock();
-				if (cur.getLeft() != null) {
-					cur.getLeft().unlock();
+				FineTunedSkipListEntry temp;
+				if (cur.getRight().getValue() > val) {
+					temp = cur;
+					cur = cur.getDown();
+					if(cur == null){
+						return null;
+					}
+					cur.lock();
+					temp.unlock();
+				} else if (cur.getRight().getValue() == val) {
+					temp = cur;
+					cur = cur.getRight();
+					cur.lock();
+					temp.unlock();
+					break;
 				}
 			}
-			FineTunedSkipListEntry temp;
-			if (cur.getRight().getValue() > val) {
-				temp = cur;
-				cur = cur.getDown();
-				if(cur == null){
-					return null;
-				}
-				cur.lock();
-				temp.unlock();
-			} else if (cur.getRight().getValue() == val) {
-				temp = cur;
+			else{
 				cur = cur.getRight();
-				cur.lock();
-				temp.unlock();
-				break;
 			}
 		}
 		cur.unlock();
@@ -147,23 +152,70 @@ public class FineTunedSkipList {
 		return cur;
 	}
 	
-	public void delete(int val) { //do we need to return a bool if it works?
-		FineTunedSkipListEntry localVal = this.get(val);
+	public void delete(int val) {
+		FineTunedSkipListEntry cur = head;
+		FineTunedSkipListEntry temp;
+		cur.lock();
+		while (cur != null) {
+			if(cur.getRight() != null){
+				while (cur.getRight().getValue() < val) {
+					temp = cur;
+					cur = cur.getRight();
+					if(cur == null){
+						temp.unlock();
+						return;
+					}
+					cur.lock();
+					temp.unlock();
+				}
+				if (cur.getRight().getValue() > val) {
+					temp = cur;
+					cur = cur.getDown();
+					if(cur == null){
+						temp.unlock();
+						return;
+					}
+					cur.lock();
+					temp.unlock();
+				} else if (cur.getRight().getValue() == val) {
+					FineTunedSkipListEntry myVal = cur.getRight();
+					FineTunedSkipListEntry newNext = myVal.getRight();
+					myVal.lock();
+					newNext.lock();
+					cur.setRight(newNext);
+					newNext.setLeft(cur);
+					myVal.setAllToNull();
+					newNext.unlock();
+					myVal.unlock();
+					temp = cur;
+					cur = cur.getDown();
+					if(cur != null){
+						cur.lock();
+					}
+					temp.unlock();
+				}
+			}
+			else{
+				cur = cur.getRight();
+			}
+		}
+		/*FineTunedSkipListEntry localVal = this.get(val);
 		while (localVal != null) {
-			localVal.lock();
 			FineTunedSkipListEntry preVal = localVal.getLeft();
 			preVal.lock();
+			localVal.lock();
 			FineTunedSkipListEntry nextVal = localVal.getRight();
 			nextVal.lock();
 			preVal.setRight(nextVal);
 			nextVal.setLeft(preVal);
+			nextVal.unlock();
+			preVal.unlock();
 			FineTunedSkipListEntry oldLocal = localVal;
 			localVal = localVal.getDown();
-			preVal.unlock();
-			nextVal.unlock();
 			oldLocal.setAllToNull();
 			oldLocal.unlock();
 		}
+		*/
 	}
 	
 	public StringBuilder print() {

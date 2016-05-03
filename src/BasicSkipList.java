@@ -32,6 +32,7 @@ public class BasicSkipList {
 	}
 	
 	public void add(Integer addValue){
+		//System.out.println("add " + addValue);
 		if(!head.getRight().getValue().equals(Integer.MAX_VALUE)){
 			SkipListEntry newHead = new SkipListEntry(Integer.MIN_VALUE);
 			newHead.setDown(head);
